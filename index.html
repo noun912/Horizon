@@ -2,63 +2,141 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>2035 未来出行</title>
 <style>
   :root{
-    --bg-dark:#070b14;
-    --hud:#00ffd0;
-    --hud2:#5edfff;
-    --card:#0e1626;
-    --text:#e6f7ff;
-    --muted:#7d9fb5;
+    --bg:#060913;          /* 深夜底色 */
+    --ink:#0b1220;         /* 深夜墨蓝 */
+    --hud:#00ffd0;         /* HUD 青绿 */
+    --hud2:#5edfff;        /* HUD 电蓝 */
+    --card:#0e1626;        /* 面板底 */
+    --text:#e6f7ff;        /* 文字高亮 */
+    --muted:#9fb4c6;       /* 次级文字 */
+    --border:rgba(255,255,255,.12);
   }
-  *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto}
-  body{
-    background:radial-gradient(800px 600px at 50% 20%,#101a2e,#05070d);
-    color:var(--text);
-    overflow-x:hidden;
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,"PingFang SC",sans-serif;overflow-x:hidden}
+
+  /* ===== 背景：② 脑波链接 + ③ 星空沉浸（融合） ===== */
+  /* 星空层（更多星点 + 微呼吸） */
+  .stars, .stars::before, .stars::after{
+    position:fixed;inset:0;content:"";pointer-events:none;z-index:-3
   }
-  /* HUD 星空粒子 */
-  .stars{position:fixed;inset:0;z-index:-2;background:transparent;pointer-events:none}
-  .stars::before,.stars::after{
-    content:"";position:absolute;inset:0;background-image:radial-gradient(2px 2px at 20% 30%,rgba(255,255,255,.5),transparent),radial-gradient(1.5px 1.5px at 80% 60%,rgba(255,255,255,.4),transparent),radial-gradient(1.2px 1.2px at 40% 80%,rgba(255,255,255,.35),transparent);
-    animation:twinkle 6s infinite linear;
+  .stars{
+    background:
+      radial-gradient(1.5px 1.5px at 20% 30%, rgba(255,255,255,.45), transparent),
+      radial-gradient(1px 1px     at 70% 60%, rgba(255,255,255,.35), transparent),
+      radial-gradient(1px 1px     at 40% 80%, rgba(255,255,255,.28), transparent),
+      radial-gradient(2px 2px     at 60% 15%, rgba(255,215,130,.18), transparent);
+    animation: twinkle 6s ease-in-out infinite;
   }
-  @keyframes twinkle{0%{opacity:.8}50%{opacity:.25}100%{opacity:.8}}
-  /* HUD 网格 */
-  .grid::before{content:"";position:fixed;inset:0;z-index:-3;background-image:linear-gradient(rgba(0,255,208,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,208,.05) 1px,transparent 1px);background-size:40px 40px;opacity:.4;filter:blur(.4px)}
+  .stars::before{
+    background:
+      radial-gradient(800px 600px at 50% 15%, rgba(20,40,90,.35), transparent 60%),
+      radial-gradient(900px 700px at 80% 120%, rgba(12,20,36,.45), transparent 60%);
+    z-index:-4;
+  }
+  .stars::after{
+    background:
+      radial-gradient(1200px 900px at 10% 110%, rgba(0,60,140,.18), transparent 65%),
+      radial-gradient(1000px 800px at 100% 0%,  rgba(0,200,160,.12), transparent 65%);
+    filter: blur(2px); opacity:.8; z-index:-5;
+  }
+  @keyframes twinkle{0%{opacity:.9}50%{opacity:.5}100%{opacity:.9}}
 
-  .wrap{max-width:560px;margin:0 auto;padding:32px 20px 100px}
-  header{display:flex;align-items:center;gap:10px;margin-bottom:18px}
-  .dot{width:10px;height:10px;border-radius:50%;background:var(--hud);box-shadow:0 0 12px var(--hud)}
-  h1{font-size:22px;font-weight:700}
+  /* HUD 神经网络线（淡网格 + 中央脉冲波） */
+  .hud-grid::before{
+    content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+    background-image:
+      linear-gradient(rgba(0,255,208,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,208,.06) 1px, transparent 1px);
+    background-size:48px 48px;
+    opacity:.25;filter:blur(.4px);
+  }
+  .neuro{
+    position:fixed;inset:0;z-index:-1;pointer-events:none;
+    display:flex;align-items:center;justify-content:center;
+  }
+  /* 中央脉冲环 */
+  .pulse{
+    width:42vmin;height:42vmin;border-radius:50%;
+    background: radial-gradient(closest-side, rgba(0,255,208,.14), rgba(0,255,208,0) 60%);
+    box-shadow:0 0 60px rgba(0,255,208,.18) inset;
+    animation:pulse 5.5s ease-in-out infinite;
+    mask: radial-gradient(circle at 50% 50%, rgba(255,255,255,.9), transparent 62%);
+  }
+  @keyframes pulse{
+    0%{transform:scale(0.98);opacity:.75}
+    50%{transform:scale(1.03);opacity:1}
+    100%{transform:scale(0.98);opacity:.75}
+  }
+  /* 脑波线（SVG描边动画） */
+  .wave{
+    position:absolute;width:86vmin;height:34vmin;opacity:.6;filter:drop-shadow(0 0 8px rgba(94,223,255,.2));
+    animation: float 9s ease-in-out infinite;
+  }
+  @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+  .wave path{
+    fill:none;stroke:url(#grad);stroke-width:1.5;
+    stroke-dasharray:260;stroke-dashoffset:520;
+    animation:dash 6s linear infinite;
+  }
+  @keyframes dash{to{stroke-dashoffset:0}}
 
-  .card{background:var(--card);border:1px solid rgba(0,255,208,.1);border-radius:18px;padding:20px;margin-top:16px;box-shadow:0 8px 20px rgba(0,0,0,.35)}
-  .q{font-size:18px;line-height:1.6;margin-bottom:14px}
-  .hint{font-size:13px;color:var(--muted);margin-bottom:14px}
+  .wrap{max-width:680px;margin:0 auto;padding:32px 18px 120px}
+  header{display:flex;align-items:center;gap:10px;margin:8px 0 16px 0}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--hud);box-shadow:0 0 14px var(--hud)}
+  h1{font-size:22px;margin:0;font-weight:700}
+  .sub{color:var(--muted);font-size:13px}
 
-  .chip{padding:12px 14px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.02);cursor:pointer;margin-bottom:10px;transition:.2s}
-  .chip:hover{border-color:var(--hud);background:rgba(0,255,208,.07)}
-  .chip.sel{border-color:var(--hud);background:rgba(0,255,208,.18);box-shadow:0 0 12px rgba(0,255,208,.2)}
-
-  .actions{display:flex;gap:10px;margin-top:14px}
-  .btn{padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);cursor:pointer;color:var(--text)}
-  .btn.primary{border-color:var(--hud);background:linear-gradient(180deg,rgba(0,255,208,.25),rgba(0,255,208,.05))}
-
-  .progress{height:6px;background:#1a2738;border-radius:999px;overflow:hidden;margin:12px 0 8px}
+  .progress{height:6px;background:#111a29;border-radius:999px;overflow:hidden;margin:12px 0 8px;border:1px solid var(--border)}
   .bar{height:100%;background:linear-gradient(90deg,var(--hud),var(--hud2));width:0%;transition:width .25s ease}
 
-  /* 结果卡 */
-  .result-card{background:rgba(0,0,0,.45);backdrop-filter:blur(12px);border:1px solid rgba(0,255,208,.3);border-radius:18px;padding:20px;margin-top:20px}
+  .card{background:rgba(14,22,38,.75);backdrop-filter: blur(12px) saturate(120%);border:1px solid var(--border);border-radius:18px;box-shadow:0 12px 36px rgba(0,0,0,.45);padding:20px;margin:14px 0}
+  .q{font-size:18px;line-height:1.6;margin-bottom:8px}
+  .hint{opacity:.8;font-size:13px;color:var(--muted);margin:4px 0 12px}
+  .chip{padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.03);cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin:8px 0;transition:.18s}
+  .chip:hover{border-color:rgba(0,255,208,.35);background:rgba(0,255,208,.06)}
+  .chip.sel{border-color:var(--hud);background:rgba(0,255,208,.18);box-shadow:0 0 0 3px rgba(0,255,208,.18)}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{padding:12px 16px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);cursor:pointer}
+  .btn.primary{border-color:var(--hud);background:linear-gradient(180deg, rgba(0,255,208,.22), rgba(0,255,208,.06));box-shadow:0 8px 20px rgba(0,255,208,.22)}
+  .actions{display:flex;gap:10px;margin-top:12px}
+  .muted{opacity:.7;color:var(--muted)}
+  input[type=range]{width:100%}
+
+  .result{background:rgba(0,0,0,.5);border:1px solid var(--border);border-radius:18px;padding:18px;display:none}
+  textarea{width:100%;min-height:120px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);padding:12px;resize:vertical;outline:none}
 </style>
 </head>
 <body>
+<!-- 背景：星空 + HUD 网格 + 中央脑波脉冲 -->
 <div class="stars"></div>
-<div class="grid"></div>
+<div class="hud-grid"></div>
+<div class="neuro">
+  <div class="pulse"></div>
+  <svg class="wave" viewBox="0 0 600 220" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="grad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#00ffd0"/><stop offset="100%" stop-color="#5edfff"/>
+      </linearGradient>
+    </defs>
+    <path d="M0,110 C60,60 120,160 180,110 C240,60 300,160 360,110 C420,60 480,160 540,110 C560,95 580,100 600,110" />
+  </svg>
+</div>
+
 <div class="wrap">
-  <header><div class="dot"></div><h1>2035 未来出行</h1></header>
+  <header>
+    <div class="dot"></div>
+    <div>
+      <h1>2035 未来出行</h1>
+      <div class="sub">沉浸式 · 真实可用 · 数据驱动</div>
+    </div>
+  </header>
+
   <div class="progress"><div id="bar" class="bar"></div></div>
+
   <div id="panel" class="card">
     <div id="qtext" class="q"></div>
     <div id="hint" class="hint"></div>
@@ -68,60 +146,270 @@
       <button class="btn primary" id="nextBtn" onclick="next()">继续</button>
     </div>
   </div>
-  <div id="result" class="result-card" style="display:none"></div>
+
+  <div id="result" class="result"></div>
 </div>
 
+<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script>
+/* ============ 0) Supabase + 会话 ============ */
 const SUPABASE_URL = "https://xrsthdmcujustsezwaln.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyc3RoZG1jdWp1c3RzZXp3YWxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NzkxMzAsImV4cCI6MjA3NzM1NTEzMH0.i3iGszKjV6UAnG9HpT7o9p83QMT84z2GJ1V5fDawdD0";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let stored = localStorage.getItem("survey_done");
-let allowRecord = !stored;
-if(stored){
-  if(confirm("你已经填写过一次问卷\n\n确定 = 覆盖旧记录\n取消 = 本次不记录，仅体验")){
-    localStorage.removeItem("survey_done");
+// 生成一个会话 id（用于聚合同一份作答）
+const session_id = (crypto && crypto.randomUUID) ? crypto.randomUUID() :
+                   'sess_'+Math.random().toString(36).slice(2)+Date.now();
+
+/* ============ 1) 首次/重复作答 选择逻辑 ============ */
+let allowRecord = !localStorage.getItem('survey_done');
+if (!allowRecord) {
+  const msg = "系统检测到你已提交过一次问卷。\n\n【确定】覆盖旧记录，重新提交\n【取消】本次仅体验，不记录数据";
+  if (confirm(msg)) {
+    localStorage.removeItem('survey_done');
     allowRecord = true;
-  } else allowRecord = false;
+  } else {
+    allowRecord = false;
+    window.skipLog = true;
+  }
 }
 
-// 简化问题集（示例）
-const quiz=[
- {key:'age',type:'single',q:'2035 · 你将处于哪段人生能量周期？',hint:'用于责任指数',opts:['≤25','26–35','36–45','46–55','56–65','≥66']},
- {key:'city',type:'single',q:'你所在的城市类型是？',hint:'生态复杂度',opts:['一线','新一线/省会','地级市','县城','乡镇']},
- {key:'freq',type:'single',q:'你的出行频率是？',hint:'行动节奏',opts:['低频','稳定','高频','随机灵感']},
- {key:'form',type:'single',q:'未来你期望的出行形态？',hint:'载具形态',opts:['胶囊车','仿生伴行','空间流动','神经旅程','混合模式']},
+/* ============ 2) 问题集（16题，文案更通俗） ============ */
+/* type: 'single' 单选 | 'multi' 多选（max） | 'likert' 五级 | 'sliders' 五个滑条 | 'rank' 点击排序 | 'open' 文本 */
+const quiz = [
+  // Ⅰ 未来身份坐标
+  {key:'age_stage', type:'single', q:'2035年，你预计会处于哪个人生阶段？', hint:'用于理解出行责任与生活节奏',
+   opts:[
+     '≤25｜探索与起步（学生 / 初入职场）',
+     '26–35｜成长与效率（事业积累 / 可能成家）',
+     '36–45｜平衡与构建（家庭+事业双线）',
+     '46–55｜成熟与拓展（稳定与拓宽）',
+     '56–65｜舒适与长程体验',
+     '≥66｜陪伴与健康'
+   ]},
+  {key:'city_tier', type:'single', q:'你所在的城市类型是？', hint:'不同城市出行结构差别',
+   opts:[
+     '一线/超级城市（北上广深…）',
+     '新一线/省会（成都/杭州/武汉…）',
+     '地级市（大部分城市）',
+     '县城/小城（节奏更舒适）',
+     '乡镇/乡野（自然、距离更长）'
+   ]},
+  {key:'family', type:'single', q:'你目前的家庭/同行结构？', hint:'影响空间与服务需求',
+   opts:['单人生活或独居','伴侣同行','核心家庭（含子女）','多代共居/跨年龄家庭','其他/灵活结构']},
+
+  // Ⅱ 行动模式与出行语境
+  {key:'purpose', type:'multi', max:3, q:'你日常出行主要目的是什么？（最多选3）', hint:'请选择贴近你日常的场景',
+   opts:['通勤（上班/上学）','家庭照护/孩子出行','商务活动','城市生活体验（逛逛/运动/咖啡）','城际/长途出行','移动办公/学习','其他']},
+  {key:'daily_km', type:'single', q:'你每天的大概移动距离？', hint:'直觉参考：上班通勤约 10–25km',
+   opts:[
+     '0–30km｜附近生活圈 / 短通勤',
+     '31–60km｜跨城区通勤',
+     '61–100km｜大都市穿行',
+     '101–150km｜跨城边缘通勤',
+     '150km+｜长程移动 / 城际生活'
+   ]},
+  {key:'time_slot', type:'single', q:'你的出行时间更偏向？', hint:'选择最常见的一个',
+   opts:['早高峰/上午','白天为主','早晚高峰穿行','夜间偏多','不固定/取决安排']},
+  {key:'freq', type:'single', q:'出行频率更接近？', hint:'节奏感受',
+   opts:['偶尔 / 非日常','每天固定往返','高强度多节点（多地穿行）','灵感与需求驱动（灵活工作）']},
+
+  // Ⅲ 公共系统协同
+  {key:'public_share', type:'likert', q:'未来你会多大程度依赖城市交通与共享系统？', hint:'1=几乎不用，5=几乎不考虑私家车', opts:['1','2','3','4','5']},
+
+  // Ⅳ 未来移动体形态与偏好
+  {key:'form', type:'single', q:'你最偏好的未来出行形态？', hint:'选择你更愿意长期相处的形态',
+   opts:[
+     '⚡ 进化能量座舱｜像私人空间舱，安全安静',
+     '🐾 仿生共生体｜有情感的陪伴体，像“机宠/灵兽”',
+     '🌫 流动空间｜像房间随你展开/收拢',
+     '🧠 神经通路｜沉浸式“心智旅行/意识深潜”',
+     '🌀 自定义融合｜形态随任务变化'
+   ]},
+
+  // 10：五项原型打分（滑条）
+  {key:'prototype_scores', type:'sliders', q:'请为以下原型打分（1–5）', hint:'向右更喜欢',
+   sliders:[
+     {key:'A_能量座舱', label:'A 能量座舱（飞行舱/能量舱）', min:1, max:5, val:3},
+     {key:'B_仿生形态', label:'B 仿生形态/灵兽（植物/动物陪伴）', min:1, max:5, val:3},
+     {key:'C_空间变换', label:'C 空间变换式移动（像房间滑动）', min:1, max:5, val:3},
+     {key:'D_神经深潜', label:'D 神经深潜/意识旅行', min:1, max:5, val:3},
+     {key:'E_自定义变形', label:'E 自定义变形模式', min:1, max:5, val:3},
+   ]},
+
+  // Ⅴ 自动驾驶与感知交付
+  {key:'autonomy', type:'single', q:'你愿意让出多少“驾驶权限”？', hint:'选择你最舒适的模式',
+   opts:['我自己开为主','我主驾+AI辅助','AI主驾+我监督','全自动（无方向盘）','意识控制/融合驾驶']},
+
+  // （原第12题预算 已删）
+  {key:'in_cabin', type:'single', q:'车内你最常处于什么状态？', hint:'决定舱内模式偏好',
+   opts:['休息恢复','娱乐沉浸','工作学习','冥想/静心','社交交流']},
+
+  // Ⅵ 舱内能力
+  {key:'features', type:'multi', max:4, q:'你希望优先强化哪些舱内能力？（最多选4）', hint:'选择最重要的功能',
+   opts:['AI助理与自动化','舒适座舱/座椅智能','沉浸声场/氛围','健康与情绪监测','高速互联/导航协同','可变空间/收纳','户外拓展（露营/供电）','其他']},
+
+  {key:'ota', type:'single', q:'你希望移动体是否“像手机一样不断升级”？', hint:'车辆可通过网络自动更新功能/修复问题/逐步变强',
+   opts:['不需要','可选择升级','定期功能更新','高度依赖更新','理想：自动升级，体验越来越强']},
+
+  // Ⅶ 价值排序（点击选出优先顺序：实现B方案）
+  {key:'priority', type:'rank', q:'对你来说，以下因素的优先级（从高到低）？', hint:'点击条目依次选出第1～第8位；可重置',
+   items:['安全','智能与自动化能力','外观与设计','舒适与空间','品牌/信任感','能耗成本','环境友好','价格预算']},
+
+  // Ⅷ 开放式
+  {key:'open', type:'open', q:'用一句话，描述你心中的 2035 理想移动体验', hint:'例如：“像一个随身携带的宁静能量空间”。'}
 ];
 
-let i=-1;const answers={};
-const qEl=document.getElementById('qtext');const hintEl=document.getElementById('hint');const optsEl=document.getElementById('opts');const barEl=document.getElementById('bar');const panel=document.getElementById('panel');const res=document.getElementById('result');
+/* ============ 3) 运行逻辑 ============ */
+let i = -1;                 // 当前题目索引
+const answers = {};         // 收集答案：key -> value
+const qEl = document.getElementById('qtext');
+const hintEl = document.getElementById('hint');
+const optsEl = document.getElementById('opts');
+const barEl = document.getElementById('bar');
+const panelEl = document.getElementById('panel');
+const resultEl = document.getElementById('result');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
 
-function prev(){if(i<=0)return;i--;render();}
-function next(){i++;if(i>=quiz.length)return finish();render();}
+function prev(){ if(i<=0) return; i--; render(); }
+function next(){ i++; if(i>=quiz.length){ finish(); return; } render(); }
+function setProgress(){ barEl.style.width = (i/quiz.length*100)+'%'; }
 
 function render(){
- document.getElementById('prevBtn').style.display=i>0?'inline-flex':'none';
- barEl.style.width=(i/quiz.length*100)+"%";
- const q=quiz[i];qEl.textContent=q.q;hintEl.textContent=q.hint;optsEl.innerHTML="";
- q.opts.forEach(opt=>{
-  const d=document.createElement('div');d.className='chip';d.textContent=opt;
-  d.onclick=()=>{answers[q.key]=opt;log(q.q,opt);next();};
-  optsEl.appendChild(d);
- });
+  prevBtn.style.display = i>0? 'inline-flex':'none';
+  setProgress();
+  const q = quiz[i];
+  qEl.textContent = q.q;
+  hintEl.textContent = q.hint || '';
+  optsEl.innerHTML = '';
+  nextBtn.style.display = (q.type==='single' || q.type==='likert') ? 'none' : 'inline-flex';
+
+  if(q.type==='single'){
+    q.opts.forEach(opt=>{
+      const d = document.createElement('div'); d.className = 'chip'; d.textContent = opt;
+      d.onclick = ()=>{ answers[q.key] = opt; logStep(q.key, q.q, opt); next(); };
+      optsEl.appendChild(d);
+    });
+  }
+  else if(q.type==='multi'){
+    const max = q.max || 99;
+    const picked = new Set(answers[q.key]||[]);
+    q.opts.forEach(opt=>{
+      const d = document.createElement('div'); d.className='chip'; d.textContent=opt;
+      if(picked.has(opt)) d.classList.add('sel');
+      d.onclick = ()=>{
+        if(picked.has(opt)){ picked.delete(opt); d.classList.remove('sel');}
+        else{ if(picked.size>=max){ alert(`最多选择 ${max} 项`); return; } picked.add(opt); d.classList.add('sel'); }
+        answers[q.key] = Array.from(picked);
+      };
+      optsEl.appendChild(d);
+    });
+    nextBtn.onclick = ()=>{
+      const val = answers[q.key]||[];
+      if(val.length===0){ alert('请至少选择 1 项'); return; }
+      logStep(q.key, q.q, val.join('、'));
+      next();
+    }
+  }
+  else if(q.type==='likert'){
+    const row = document.createElement('div'); row.className='row';
+    q.opts.forEach(v=>{
+      const b = document.createElement('button'); b.className='btn'; b.textContent=v;
+      b.onclick = ()=>{ answers[q.key]=v; logStep(q.key, q.q, v); next(); };
+      row.appendChild(b);
+    });
+    optsEl.appendChild(row);
+  }
+  else if(q.type==='sliders'){
+    q.sliders.forEach(s=>{
+      const wrap = document.createElement('div'); wrap.className='chip'; wrap.style.display='block';
+      const lab = document.createElement('div'); lab.style.marginBottom='8px'; lab.textContent = s.label;
+      const rng = document.createElement('input'); rng.type='range'; rng.min=s.min; rng.max=s.max; rng.value=s.val; rng.step=1;
+      const val = document.createElement('span'); val.style.marginLeft='8px'; val.textContent = s.val;
+      rng.oninput = ()=>{ val.textContent = rng.value; collect(); };
+      wrap.appendChild(lab); wrap.appendChild(rng); wrap.appendChild(val);
+      optsEl.appendChild(wrap);
+    });
+    function collect(){
+      const obj={}; const sliders=optsEl.querySelectorAll('input[type=range]');
+      sliders.forEach((el,idx)=>{ obj[q.sliders[idx].key]=+el.value; });
+      answers[q.key]=obj;
+    }
+    collect();
+    nextBtn.onclick = ()=>{ logStep(q.key, q.q, JSON.stringify(answers[q.key])); next(); }
+  }
+  else if(q.type==='rank'){
+    // B 方案：点击依次确定第1~第8位，可重置
+    const pool = [...q.items];
+    const order = [];
+    const poolBox = document.createElement('div');
+    const pickedBox = document.createElement('div');
+    const resetBtn = document.createElement('button');
+    poolBox.className='card'; poolBox.style.background='rgba(255,255,255,.03)'; poolBox.style.margin='8px 0';
+    pickedBox.className='card'; pickedBox.style.background='rgba(0,255,208,.06)'; pickedBox.style.margin='8px 0';
+    resetBtn.className='btn'; resetBtn.textContent='重置';
+    const tip = document.createElement('div'); tip.className='muted'; tip.textContent='点击上方条目，按优先顺序依次选择。';
+
+    function renderRank(){
+      poolBox.innerHTML='<div class="muted">候选：</div>';
+      pool.forEach(txt=>{
+        const d=document.createElement('div'); d.className='chip'; d.textContent=txt;
+        d.onclick=()=>{ pool.splice(pool.indexOf(txt),1); order.push(txt); renderRank(); };
+        poolBox.appendChild(d);
+      });
+      pickedBox.innerHTML='<div class="muted">已选顺序：</div>';
+      order.forEach((txt,idx)=>{
+        const d=document.createElement('div'); d.className='chip sel'; d.textContent=(idx+1)+'. '+txt;
+        pickedBox.appendChild(d);
+      });
+      answers[q.key]=order.slice();
+    }
+    resetBtn.onclick=()=>{ pool.splice(0,pool.length,...q.items); order.splice(0,order.length); renderRank(); }
+    renderRank();
+    optsEl.appendChild(poolBox);
+    optsEl.appendChild(pickedBox);
+    optsEl.appendChild(tip);
+    const action = document.createElement('div'); action.className='actions';
+    const ok = document.createElement('button'); ok.className='btn primary'; ok.textContent='完成此题';
+    ok.onclick=()=>{ if((answers[q.key]||[]).length!==q.items.length){ alert('请按顺序选满所有项'); return; } logStep(q.key, q.q, (answers[q.key]||[]).join(' > ')); next(); };
+    action.appendChild(resetBtn); action.appendChild(ok);
+    optsEl.appendChild(action);
+  }
+  else if(q.type==='open'){
+    const ta = document.createElement('textarea'); ta.placeholder='例如：像一个随身携带的宁静能量空间。';
+    ta.oninput = ()=>{ answers[q.key]=ta.value; };
+    optsEl.appendChild(ta);
+    nextBtn.onclick = ()=>{ logStep(q.key, q.q, (answers[q.key]||'').slice(0,500)); next(); }
+  }
 }
 
-async function log(step,ans){
- if(!allowRecord)return;
- await sb.from('answers').insert({step,answer:ans,time:new Date().toISOString()});
+async function logStep(key, step, answer){
+  if(!allowRecord) return;               // 体验模式不记
+  try{
+    await sb.from('answers').insert({
+      session: session_id,
+      qkey: key,
+      step,
+      answer,
+      time: new Date().toISOString()
+    });
+  }catch(e){ console.log('log error', e); }
 }
 
 function finish(){
- panel.style.display='none';res.style.display='block';
- localStorage.setItem('survey_done','1');
- res.innerHTML=`✅ 已完成！<br><br>感谢你参与未来出行共创 🌌`;
+  panelEl.style.display='none';
+  resultEl.style.display='block';
+  if(allowRecord) localStorage.setItem('survey_done','yes');
+  resultEl.innerHTML = `
+    <div style="font-size:18px;margin-bottom:8px">✅ 已提交成功</div>
+    <div class="muted">感谢你参与 2035 未来出行 · 共创。<br/>（如需再次体验，可刷新页面并选择“仅体验不记录”）</div>
+  `;
 }
 
+/* 启动 */
 next();
 </script>
-</body></html>
+</body>
+</html>
