@@ -328,14 +328,21 @@ async function exportCard(){
 }
 
 // localStorage 检查
-if(localStorage.getItem('answered')==='yes'){
-  if(confirm('您之前已完成问卷。
-选择“确定”重新记录，或“取消”仅体验不记录。')){
-    localStorage.removeItem('answered');
-  }else{
-    window.skipLog = true;
+(function(){
+  let allowRecord = true;
+  let stored = localStorage.getItem('answered');
+  if (stored === 'yes') {
+    const msg = "检测到你已提交过问卷。\n\n选择：\n【确定】覆盖旧记录重新提交\n【取消】仅体验，不记录数据";
+    if (confirm(msg)) {
+      localStorage.removeItem('answered');
+      allowRecord = true;
+    } else {
+      allowRecord = false;
+      window.skipLog = true;
+    }
   }
-}
+  window.allowRecord = allowRecord;
+})();
 // 启动
 // 如果已填过，提示用户
 if(!allowRecord){
