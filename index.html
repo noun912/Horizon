@@ -81,8 +81,8 @@
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
 /***** 1) 替换为你的 Supabase 凭据 *****/
-const SUPABASE_URL = "YOUR_SUPABASE_URL"; // ← 必填
-const SUPABASE_KEY = "YOUR_ANON_PUBLIC_KEY"; // ← 必填
+const SUPABASE_URL = "https://xrsthdmcujustsezwaln.supabase.co"; // ← 必填
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyc3RoZG1jdWp1c3RzZXp3YWxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NzkxMzAsImV4cCI6MjA3NzM1NTEzMH0.i3iGszKjV6UAnG9HpT7o9p83QMT84z2GJ1V5fDawdD0"; // ← 必填
 const sb = (SUPABASE_URL && SUPABASE_KEY && window.supabase) ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
 /***** 2) 题库（来自你的原问卷，路线 D 文案） *****/
@@ -308,3 +308,4 @@ setTimeout(start, 600);
 </script>
 </body>
 </html>
+
