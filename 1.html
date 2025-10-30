@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>PMC-2035 移动智能体适配测试</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", "PingFang SC", sans-serif;
+    background: #0a0f1c;
+    color: #e6e9ef;
+  }
+  .screen {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    text-align: center;
+  }
+  .btn {
+    padding: 12px 20px;
+    margin-top: 24px;
+    border: 1px solid #5ad0ff;
+    color: #5ad0ff;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .btn:hover {
+    background: rgba(90,208,255,0.15);
+  }
+  .fade {
+    opacity: 0;
+    transition: opacity .6s;
+  }
+  .fade.show {
+    opacity: 1;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 300px;
+  }
+  .opt {
+    padding: 12px;
+    border: 1px solid #445;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .opt:hover {
+    background: rgba(255,255,255,0.1);
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// Minimal H5 prototype states
+const steps = [
+  {
+    text: "欢迎接入 PMC-2035 移动智能体适配系统\n意识同步初始化中…",
+    button: "开始测试"
+  },
+  {
+    text: "2035 年，你期待自己处于哪个人生阶段？",
+    options: ["≤25｜探索与突破", "26–35｜效率与成长", "36–45｜家庭与事业平衡", "46–55｜稳健拓展", "≥56｜从容与健康"]
+  },
+  {
+    text: "你理想的未来移动体形态？",
+    options: ["进化型飞行舱", "仿生灵兽陪伴体", "沉浸式空间穿行", "神经感知旅程"]
+  },
+  {
+    text: "已接收你的意识偏好。\n正在为你生成原型……",
+    button: "查看结果"
+  },
+  {
+    result: true,
+    text: "你的移动体基因：\n【沉浸式探索型意识驾驶者】\n— 优先追求自由、灵感与动态场景。\n未来座舱建议：全景界面·静音流体空间·灵感触发系统"
+  }
+];
+
+let idx = 0;
+const app = document.getElementById("app");
+
+function render() {
+  const s = steps[idx];
+  const div = document.createElement("div");
+  div.className = "screen fade";
+
+  const p = document.createElement("div");
+  p.innerHTML = s.text.replace(/\n/g, "<br>");
+  div.appendChild(p);
+
+  if (s.options) {
+    const box = document.createElement("div");
+    box.className = "options";
+    s.options.forEach(o => {
+      const op = document.createElement("div");
+      op.className = "opt";
+      op.textContent = o;
+      op.onclick = () => next();
+      box.appendChild(op);
+    });
+    div.appendChild(box);
+  }
+
+  if (s.button) {
+    const btn = document.createElement("button");
+    btn.className = "btn";
+    btn.textContent = s.button;
+    btn.onclick = () => next();
+    div.appendChild(btn);
+  }
+
+  app.innerHTML = "";
+  app.appendChild(div);
+  requestAnimationFrame(() => div.classList.add("show"));
+}
+
+function next() {
+  idx = Math.min(idx + 1, steps.length - 1);
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
