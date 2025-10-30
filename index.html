@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>2035 未来出行 ·  人格问卷</title>
+<title>2035 未来出行 · AI 人格问卷</title>
 <style>
   :root{
     --ink:#0a0f1c; /* HUD 青黑 */
@@ -69,7 +69,7 @@
 <div class="wrap">
   <header>
     <div class="dot"></div>
-    <h1>2035 未来出行 · 人格问卷</h1>
+    <h1>2035 未来出行 · AI 人格问卷</h1>
   </header>
   <div class="progress"><div id="bar" class="bar"></div></div>
 
@@ -98,26 +98,7 @@ const SUPABASE_URL = "https://xrsthdmcujustsezwaln.supabase.co"; // ← 必填
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyc3RoZG1jdWp1c3RzZXp3YWxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NzkxMzAsImV4cCI6MjA3NzM1NTEzMH0.i3iGszKjV6UAnG9HpT7o9p83QMT84z2GJ1V5fDawdD0"; // ← 必填
 // 本地记录是否已填
 // 二次填写选择：保留旧数据 or 覆盖
-let stored = localStorage.getItem('survey_done');
-let allowRecord = !stored;
-if(stored){
-  // 二次进入弹窗
-  const msg = "检测到你之前已经提交过一次问卷。
 
-选择方式：
-① 保留上次答案，这次只体验不记录
-② 删除上次记录，这次重新提交";
-  const re = confirm(msg + "
-
-点击【确定】= 覆盖旧记录
-点击【取消】= 本次不记录，仅体验");
-  if(re){
-    // 用户选择覆盖，清空标记
-    localStorage.removeItem('survey_done');
-    allowRecord = true;
-  } else {
-    allowRecord = false;
-  }
 }
 let allowRecord = !localStorage.getItem('survey_done');
 const sb = (SUPABASE_URL && SUPABASE_KEY && window.supabase) ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
