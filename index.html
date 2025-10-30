@@ -134,5 +134,31 @@ function next() {
 
 render();
 </script>
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  
+  <script>
+  const SUPABASE_URL = "https://xrsthdmcujustsezwaln.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyc3RoZG1jdWp1c3RzZXp3YWxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NzkxMzAsImV4cCI6MjA3NzM1NTEzMH0.i3iGszKjV6UAnG9HpT7o9p83QMT84z2GJ1V5fDawdD0"; // ← 替换
+
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  async function saveAnswer(step, answer) {
+    const { error } = await supabaseClient.from("answers").insert({
+      step: step,
+      answer: answer,
+      time: new Date().toISOString()
+    });
+    if (error) console.log("❌ 保存失败", error);
+    else console.log("✅ 已保存:", step, answer);
+  }
+
+  // 拦截你的按钮事件，保存选项
+  function choose(step, value){
+    saveAnswer(step, value);
+    next();
+  }
+
+  </script>
 </body>
 </html>
