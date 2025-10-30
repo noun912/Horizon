@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>2035 未来出行 · 人格问卷</title>
+<title>2035 未来出行</title>
 <style>
   :root{
     --ink:#0a0f1c; /* HUD 青黑 */
@@ -69,7 +69,7 @@
 <div class="wrap">
   <header>
     <div class="dot"></div>
-    <h1>2035 未来出行 · 人格问卷</h1>
+    <h1>2035 未来出行</h1>
   </header>
   <div class="progress"><div id="bar" class="bar"></div></div>
 
@@ -96,11 +96,23 @@
 /***** 1) 替换为你的 Supabase 凭据 *****/
 const SUPABASE_URL = "https://xrsthdmcujustsezwaln.supabase.co"; // ← 必填
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyc3RoZG1jdWp1c3RzZXp3YWxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NzkxMzAsImV4cCI6MjA3NzM1NTEzMH0.i3iGszKjV6UAnG9HpT7o9p83QMT84z2GJ1V5fDawdD0"; // ← 必填
-// 本地记录是否已填
-// 二次填写选择：保留旧数据 or 覆盖
-
-}
-let allowRecord = !localStorage.getItem('survey_done');
+// localStorage 检查
+(function(){
+  let allowRecord = true;
+  let stored = localStorage.getItem('answered');
+  if (stored === 'yes') {
+    const msg = "检测到你已提交过问卷。\n\n选择：\n【确定】覆盖旧记录重新提交\n【取消】仅体验，不记录数据";
+    if (confirm(msg)) {
+      localStorage.removeItem('answered');
+      allowRecord = true;
+    } else {
+      allowRecord = false;
+      window.skipLog = true;
+    }
+  }
+  window.allowRecord = allowRecord;
+})();
+const sb = (SUPABASE_URL && SUPABASE_KEY && window.supabase) ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;('survey_done');
 const sb = (SUPABASE_URL && SUPABASE_KEY && window.supabase) ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
 /***** 2) 题库（来自你的原问卷，路线 D 文案） *****/
@@ -332,7 +344,11 @@ async function exportCard(){
   let allowRecord = true;
   let stored = localStorage.getItem('answered');
   if (stored === 'yes') {
-    const msg = "检测到你已提交过问卷。\n\n选择：\n【确定】覆盖旧记录重新提交\n【取消】仅体验，不记录数据";
+    const msg = "检测到你已提交过问卷。
+
+选择：
+【确定】覆盖旧记录重新提交
+【取消】仅体验，不记录数据";
     if (confirm(msg)) {
       localStorage.removeItem('answered');
       allowRecord = true;
@@ -352,4 +368,3 @@ setTimeout(start, 600);
 </script>
 </body>
 </html>
-
