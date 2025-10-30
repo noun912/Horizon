@@ -2,163 +2,67 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>PMC-2035 移动智能体适配测试</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>未来出行体验问卷</title>
 <style>
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: "Inter", "PingFang SC", sans-serif;
-    background: #0a0f1c;
-    color: #e6e9ef;
-  }
-  .screen {
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    text-align: center;
-  }
-  .btn {
-    padding: 12px 20px;
-    margin-top: 24px;
-    border: 1px solid #5ad0ff;
-    color: #5ad0ff;
-    border-radius: 8px;
-    background: transparent;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-  .btn:hover {
-    background: rgba(90,208,255,0.15);
-  }
-  .fade {
-    opacity: 0;
-    transition: opacity .6s;
-  }
-  .fade.show {
-    opacity: 1;
-  }
-  .options {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 20px;
-    width: 100%;
-    max-width: 300px;
-  }
-  .opt {
-    padding: 12px;
-    border: 1px solid #445;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-  .opt:hover {
-    background: rgba(255,255,255,0.1);
-  }
+body{
+  margin:0;background:#000;color:#0ff;font-family:Arial,Helvetica,sans-serif;
+  display:flex;justify-content:center;align-items:center;height:100vh;overflow:hidden;
+}
+#screen{width:90%;max-width:420px;text-align:center;}
+.text{font-size:20px;line-height:1.6;min-height:140px;}
+.opt-btn{
+  padding:12px;border:1px solid rgba(0,255,195,0.6);border-radius:8px;margin:8px 0;
+  cursor:pointer;backdrop-filter:blur(4px);transition:0.2s;
+}
+.opt-btn:hover{background:rgba(0,255,195,0.2);transform:scale(1.05);}
+.fade{animation:fade .4s ease-out;}@keyframes fade{from{opacity:0}to{opacity:1}}
 </style>
 </head>
 <body>
-<div id="app"></div>
+<div id="screen" class="fade">
+  <div id="qtext" class="text">连接未来出行意识中...</div>
+  <div id="options"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script>
-// Minimal H5 prototype states
-const steps = [
-  {
-    text: "欢迎接入 PMC-2035 移动智能体适配系统\n意识同步初始化中…",
-    button: "开始测试"
-  },
-  {
-    text: "2035 年，你期待自己处于哪个人生阶段？",
-    options: ["≤25｜探索与突破", "26–35｜效率与成长", "36–45｜家庭与事业平衡", "46–55｜稳健拓展", "≥56｜从容与健康"]
-  },
-  {
-    text: "你理想的未来移动体形态？",
-    options: ["进化型飞行舱", "仿生灵兽陪伴体", "沉浸式空间穿行", "神经感知旅程"]
-  },
-  {
-    text: "已接收你的意识偏好。\n正在为你生成原型……",
-    button: "查看结果"
-  },
-  {
-    result: true,
-    text: "你的移动体基因：\n【沉浸式探索型意识驾驶者】\n— 优先追求自由、灵感与动态场景。\n未来座舱建议：全景界面·静音流体空间·灵感触发系统"
-  }
+const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_KEY = "YOUR_ANON_PUBLIC_KEY";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// 问题集
+const qs = [
+  {q:"你的年龄区间是？",opts:["18以下","18-25","26-35","36及以上"]},
+  {q:"你更期待2035年的出行方式？",opts:["自动驾驶舱","飞行舱","共享穿梭车","个性化胶囊车"]},
+  {q:"你偏好的出行体验风格？",opts:["安静沉浸","社交活力","娱乐流媒体","效率优先"]},
+  {q:"如果出行AI给你人格标签，你希望是？",opts:["探索者","思考者","治愈者","行动者"]}
 ];
 
-let idx = 0;
-const app = document.getElementById("app");
+let step = 0;
 
-function render() {
-  const s = steps[idx];
-  const div = document.createElement("div");
-  div.className = "screen fade";
-
-  const p = document.createElement("div");
-  p.innerHTML = s.text.replace(/\n/g, "<br>");
-  div.appendChild(p);
-
-  if (s.options) {
-    const box = document.createElement("div");
-    box.className = "options";
-    s.options.forEach(o => {
-      const op = document.createElement("div");
-      op.className = "opt";
-      op.textContent = o;
-      op.onclick = () => next();
-      box.appendChild(op);
-    });
-    div.appendChild(box);
-  }
-
-  if (s.button) {
-    const btn = document.createElement("button");
-    btn.className = "btn";
-    btn.textContent = s.button;
-    btn.onclick = () => next();
-    div.appendChild(btn);
-  }
-
-  app.innerHTML = "";
-  app.appendChild(div);
-  requestAnimationFrame(() => div.classList.add("show"));
+async function saveAnswer(q,ans){
+  const {error} = await db.from("answers").insert({step:q,answer:ans,time:new Date().toISOString()});
+  if(error) console.log("❌",error); else console.log("✅",q,ans);
 }
 
-function next() {
-  idx = Math.min(idx + 1, steps.length - 1);
-  render();
+function render(){
+  const s = document.getElementById("screen"); s.classList.remove("fade"); void s.offsetWidth; s.classList.add("fade");
+  if(step >= qs.length){
+    document.getElementById("qtext").innerHTML = "链接完成。你已进入未来出行意识。<br><br>感谢参与 ✨";
+    document.getElementById("options").innerHTML = "";
+    return;
+  }
+  const q = qs[step];
+  document.getElementById("qtext").innerText = q.q;
+  document.getElementById("options").innerHTML = q.opts.map(o=>`
+    <div class='opt-btn' onclick="choose('${q.q}','${o}')">${o}</div>
+  `).join('');
 }
 
-render();
+function choose(q,a){ saveAnswer(q,a); step++; render(); }
+
+// 初始加载
+setTimeout(()=>{render();},1200);
 </script>
-  <!-- Supabase SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  
-  <script>
-  const SUPABASE_URL = "https://xrsthdmcujustsezwaln.supabase.co";
-  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyc3RoZG1jdWp1c3RzZXp3YWxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NzkxMzAsImV4cCI6MjA3NzM1NTEzMH0.i3iGszKjV6UAnG9HpT7o9p83QMT84z2GJ1V5fDawdD0"; // ← 替换
-
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  async function saveAnswer(step, answer) {
-    const { error } = await supabaseClient.from("answers").insert({
-      step: step,
-      answer: answer,
-      time: new Date().toISOString()
-    });
-    if (error) console.log("❌ 保存失败", error);
-    else console.log("✅ 已保存:", step, answer);
-  }
-
-  // 拦截你的按钮事件，保存选项
-  function choose(step, value){
-    saveAnswer(step, value);
-    next();
-  }
-
-  </script>
 </body>
 </html>
