@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>2035 未来出行 · AI 人格问卷</title>
+<title>2035 未来出行 · 人格问卷</title>
 <style>
   :root{
     --ink:#0a0f1c; /* HUD 青黑 */
@@ -11,14 +11,7 @@
     --text:#0b1220; /* 深灰文本 */
   }
   *{box-sizing:border-box}
-  body{margin:0;background:#f7f9fb;color:var(--text);font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,"PingFang SC",sans-serif;}
-  /* 背景：A（白雾）+ B（HUD 网格/星点） */
-  .bg{
-    position:fixed;inset:0;pointer-events:none;z-index:-1;
-    background:
-      radial-gradient(1200px 600px at 50% -20%, rgba(0,255,208,0.12), transparent 60%),
-      radial-gradient(800px 400px at -10% 120%, rgba(0,132,255,0.12), transparent 60%),
-      linear-gradient(180deg,#ffffff, #f6f9ff 30%, #eef4ff 100%);
+  body{margin:0;background: radial-gradient(1200px 600px at 50% -10%, rgba(255,255,255,0.9), transparent 70%), radial-gradient(900px 700px at 100% 120%, rgba(173,210,255,0.35), transparent 60%), linear-gradient(180deg,#ffffff, #f6f9ff 30%, #eef4ff 100%);
   }
   .grid:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.04) 1px,transparent 1px);background-size:24px 24px;mask-image:radial-gradient(closest-side at 50% 40%,rgba(255,255,255,1),rgba(255,255,255,0.2));}
   .stars:after{content:"";position:absolute;inset:0;background-image:radial-gradient(2px 2px at 20% 30%, rgba(0,0,0,0.08), transparent),radial-gradient(1.5px 1.5px at 70% 60%, rgba(0,0,0,0.08), transparent),radial-gradient(1.5px 1.5px at 40% 80%, rgba(0,0,0,0.08), transparent);}  
@@ -160,7 +153,7 @@ const quiz = [
     ['户外/露营模块', {S:0.2}],
     ['其他', {}]
   ]},
-  { key:'ota', type:'single', q:'OTA（进化升级）对你重要吗？', hint:'进化期望', opts:[
+  { key:'ota', type:'single', q:'OTA（进化升级，即车辆像手机一样自动更新）对你重要吗？', hint:'进化期望', opts:[
     ['无需更新', {C:0.2}], ['可选升级', {}], ['定期更新', {L:0.2}], ['高度依赖更新', {L:0.4}], ['期待持续自我进化', {L:0.6}]
   ]},
   { key:'open', type:'single', q:'用一句话描述你心中的 2035 完美移动体。', hint:'开放题（可略过）', opts:[['（略过）',{}]]}
@@ -308,4 +301,3 @@ setTimeout(start, 600);
 </script>
 </body>
 </html>
-
