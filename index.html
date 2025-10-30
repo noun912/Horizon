@@ -93,15 +93,18 @@
 <!-- html2canvas 用于导出卡片图像（可选） -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
-/***** 1) 替换为你的 Supabase 凭据 *****/
-const SUPABASE_URL = "https://xrsthdmcujustsezwaln.supabase.co"; // ← 必填
+const SUPABASE_URL = "https://xrsthdmcujustsezwaln.supabase.co"; 
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyc3RoZG1jdWp1c3RzZXp3YWxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NzkxMzAsImV4cCI6MjA3NzM1NTEzMH0.i3iGszKjV6UAnG9HpT7o9p83QMT84z2GJ1V5fDawdD0"; // ← 必填
 // localStorage 检查
 (function(){
   let allowRecord = true;
   let stored = localStorage.getItem('answered');
   if (stored === 'yes') {
-    const msg = "检测到你已提交过问卷。\n\n选择：\n【确定】覆盖旧记录重新提交\n【取消】仅体验，不记录数据";
+    const msg = "检测到你已提交过问卷。
+
+选择：
+【确定】覆盖旧记录重新提交
+【取消】仅体验，不记录数据";
     if (confirm(msg)) {
       localStorage.removeItem('answered');
       allowRecord = true;
@@ -112,8 +115,18 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
   }
   window.allowRecord = allowRecord;
 })();
-const sb = (SUPABASE_URL && SUPABASE_KEY && window.supabase) ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;('survey_done');
-const sb = (SUPABASE_URL && SUPABASE_KEY && window.supabase) ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+// ✅ Supabase client (only define once)
+if (!window.sb) {
+  window.sb = (SUPABASE_URL && SUPABASE_KEY && window.supabase)
+    ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+    : null;
+}('survey_done');
+// ✅ Supabase client (only define once)
+if (!window.sb) {
+  window.sb = (SUPABASE_URL && SUPABASE_KEY && window.supabase)
+    ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+    : null;
+}
 
 /***** 2) 题库（来自你的原问卷，路线 D 文案） *****/
 // type: 'single' 单选｜'multi' 多选（max 可选个数）｜'likert' 五级
