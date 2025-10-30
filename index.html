@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>2035 未来出行 · 人格问卷</title>
+<title>2035 未来出行 ·  人格问卷</title>
 <style>
   :root{
     --ink:#0a0f1c; /* HUD 青黑 */
@@ -11,8 +11,28 @@
     --text:#0b1220; /* 深灰文本 */
   }
   *{box-sizing:border-box}
-  body{margin:0;background: radial-gradient(1200px 600px at 50% -10%, rgba(255,255,255,0.9), transparent 70%), radial-gradient(900px 700px at 100% 120%, rgba(173,210,255,0.35), transparent 60%), linear-gradient(180deg,#ffffff, #f6f9ff 30%, #eef4ff 100%);
+  body{margin:0;background:#0a0f1c;position:relative;overflow-x:hidden;}
+  /* 深空 + HUD 粒子背景 */
+  body::before{content:"";position:fixed;inset:0;
+    background:radial-gradient(circle at 50% 40%, rgba(0,255,200,0.15), transparent 60%),
+               radial-gradient(circle at 30% 80%, rgba(0,100,255,0.12), transparent 55%),
+               #0a0f1c;
+    z-index:-3;
   }
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;
+    background-image:
+      linear-gradient(rgba(0,255,200,0.08) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(0,255,200,0.08) 1px,transparent 1px);
+    background-size:80px 80px;
+    opacity:.08;z-index:-2;
+  }
+  .stars-layer{position:fixed;inset:0;pointer-events:none;z-index:-1;
+    background-image:radial-gradient(2px 2px at 20% 30%,rgba(255,255,255,.4),rgba(255,255,255,0)),
+                     radial-gradient(1.5px 1.5px at 70% 60%,rgba(255,255,255,.3),rgba(255,255,255,0)),
+                     radial-gradient(1.2px 1.2px at 40% 80%,rgba(255,255,255,.25),rgba(255,255,255,0));
+    animation:floatStars 20s linear infinite alternate;
+  }
+  @keyframes floatStars{from{transform:translateY(0);}to{transform:translateY(-40px);} }
   .grid:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.04) 1px,transparent 1px);background-size:24px 24px;mask-image:radial-gradient(closest-side at 50% 40%,rgba(255,255,255,1),rgba(255,255,255,0.2));}
   .stars:after{content:"";position:absolute;inset:0;background-image:radial-gradient(2px 2px at 20% 30%, rgba(0,0,0,0.08), transparent),radial-gradient(1.5px 1.5px at 70% 60%, rgba(0,0,0,0.08), transparent),radial-gradient(1.5px 1.5px at 40% 80%, rgba(0,0,0,0.08), transparent);}  
 
@@ -49,7 +69,7 @@
 <div class="wrap">
   <header>
     <div class="dot"></div>
-    <h1>2035 未来出行 · AI 人格问卷</h1>
+    <h1>2035 未来出行 · 人格问卷</h1>
   </header>
   <div class="progress"><div id="bar" class="bar"></div></div>
 
@@ -76,6 +96,30 @@
 /***** 1) 替换为你的 Supabase 凭据 *****/
 const SUPABASE_URL = "https://xrsthdmcujustsezwaln.supabase.co"; // ← 必填
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyc3RoZG1jdWp1c3RzZXp3YWxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NzkxMzAsImV4cCI6MjA3NzM1NTEzMH0.i3iGszKjV6UAnG9HpT7o9p83QMT84z2GJ1V5fDawdD0"; // ← 必填
+// 本地记录是否已填
+// 二次填写选择：保留旧数据 or 覆盖
+let stored = localStorage.getItem('survey_done');
+let allowRecord = !stored;
+if(stored){
+  // 二次进入弹窗
+  const msg = "检测到你之前已经提交过一次问卷。
+
+选择方式：
+① 保留上次答案，这次只体验不记录
+② 删除上次记录，这次重新提交";
+  const re = confirm(msg + "
+
+点击【确定】= 覆盖旧记录
+点击【取消】= 本次不记录，仅体验");
+  if(re){
+    // 用户选择覆盖，清空标记
+    localStorage.removeItem('survey_done');
+    allowRecord = true;
+  } else {
+    allowRecord = false;
+  }
+}
+let allowRecord = !localStorage.getItem('survey_done');
 const sb = (SUPABASE_URL && SUPABASE_KEY && window.supabase) ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
 /***** 2) 题库（来自你的原问卷，路线 D 文案） *****/
@@ -224,6 +268,9 @@ function chooseSingle(q, label, vec){
 function addVec(vec){ for(const k in vec){ traits[k] = (traits[k]||0) + vec[k]; } }
 
 async function logStep(step, answer){
+  // 本地已填过则不记录
+  if(!allowRecord) return;
+  if(!sb) return;(step, answer){
   if(!sb) return; // 本地调试可用
   try{
     await sb.from('answers').insert({ step, answer, time:new Date().toISOString() });
@@ -231,6 +278,9 @@ async function logStep(step, answer){
 }
 
 function finish(){
+  // 首次作答标记
+  if(allowRecord){ localStorage.setItem('survey_done','1'); }
+  document.getElementById('panel').style.display='none';(){
   document.getElementById('panel').style.display='none';
   document.getElementById('result').style.display='block';
   const persona = computePersona(traits);
@@ -296,7 +346,20 @@ async function exportCard(){
   link.click();
 }
 
+// localStorage 检查
+if(localStorage.getItem('answered')==='yes'){
+  if(confirm('您之前已完成问卷。
+选择“确定”重新记录，或“取消”仅体验不记录。')){
+    localStorage.removeItem('answered');
+  }else{
+    window.skipLog = true;
+  }
+}
 // 启动
+// 如果已填过，提示用户
+if(!allowRecord){
+  setTimeout(()=>alert('系统检测到你已提交过一次，本次回答不会被记录，尽情体验吧！🎧'),1200);
+}
 setTimeout(start, 600);
 </script>
 </body>
