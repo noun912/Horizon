@@ -6,378 +6,122 @@
 <title>2035 未来出行</title>
 <style>
   :root{
-    --ink:#0a0f1c; /* HUD 青黑 */
-    --glow:#00ffd0; /* HUD 青绿 */
-    --text:#0b1220; /* 深灰文本 */
+    --bg-dark:#070b14;
+    --hud:#00ffd0;
+    --hud2:#5edfff;
+    --card:#0e1626;
+    --text:#e6f7ff;
+    --muted:#7d9fb5;
   }
-  *{box-sizing:border-box}
-  body{margin:0;background:#0a0f1c;position:relative;overflow-x:hidden;}
-  /* 深空 + HUD 粒子背景 */
-  body::before{content:"";position:fixed;inset:0;
-    background:radial-gradient(circle at 50% 40%, rgba(0,255,200,0.15), transparent 60%),
-               radial-gradient(circle at 30% 80%, rgba(0,100,255,0.12), transparent 55%),
-               #0a0f1c;
-    z-index:-3;
+  *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto}
+  body{
+    background:radial-gradient(800px 600px at 50% 20%,#101a2e,#05070d);
+    color:var(--text);
+    overflow-x:hidden;
   }
-  body::after{content:"";position:fixed;inset:0;pointer-events:none;
-    background-image:
-      linear-gradient(rgba(0,255,200,0.08) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(0,255,200,0.08) 1px,transparent 1px);
-    background-size:80px 80px;
-    opacity:.08;z-index:-2;
+  /* HUD 星空粒子 */
+  .stars{position:fixed;inset:0;z-index:-2;background:transparent;pointer-events:none}
+  .stars::before,.stars::after{
+    content:"";position:absolute;inset:0;background-image:radial-gradient(2px 2px at 20% 30%,rgba(255,255,255,.5),transparent),radial-gradient(1.5px 1.5px at 80% 60%,rgba(255,255,255,.4),transparent),radial-gradient(1.2px 1.2px at 40% 80%,rgba(255,255,255,.35),transparent);
+    animation:twinkle 6s infinite linear;
   }
-  .stars-layer{position:fixed;inset:0;pointer-events:none;z-index:-1;
-    background-image:radial-gradient(2px 2px at 20% 30%,rgba(255,255,255,.4),rgba(255,255,255,0)),
-                     radial-gradient(1.5px 1.5px at 70% 60%,rgba(255,255,255,.3),rgba(255,255,255,0)),
-                     radial-gradient(1.2px 1.2px at 40% 80%,rgba(255,255,255,.25),rgba(255,255,255,0));
-    animation:floatStars 20s linear infinite alternate;
-  }
-  @keyframes floatStars{from{transform:translateY(0);}to{transform:translateY(-40px);} }
-  .grid:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(0,0,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.04) 1px,transparent 1px);background-size:24px 24px;mask-image:radial-gradient(closest-side at 50% 40%,rgba(255,255,255,1),rgba(255,255,255,0.2));}
-  .stars:after{content:"";position:absolute;inset:0;background-image:radial-gradient(2px 2px at 20% 30%, rgba(0,0,0,0.08), transparent),radial-gradient(1.5px 1.5px at 70% 60%, rgba(0,0,0,0.08), transparent),radial-gradient(1.5px 1.5px at 40% 80%, rgba(0,0,0,0.08), transparent);}  
+  @keyframes twinkle{0%{opacity:.8}50%{opacity:.25}100%{opacity:.8}}
+  /* HUD 网格 */
+  .grid::before{content:"";position:fixed;inset:0;z-index:-3;background-image:linear-gradient(rgba(0,255,208,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,208,.05) 1px,transparent 1px);background-size:40px 40px;opacity:.4;filter:blur(.4px)}
 
-  .wrap{max-width:560px;margin:0 auto;padding:28px 18px 80px;}
-  header{display:flex;align-items:center;gap:10px;margin:8px 0 16px 0}
-  .dot{width:10px;height:10px;border-radius:50%;background:var(--glow);box-shadow:0 0 12px var(--glow);} 
-  h1{font-size:22px;margin:0;font-weight:700}
-  .card{background:#fff;border-radius:18px;box-shadow:0 8px 30px rgba(20,40,120,.08);padding:22px 18px;margin:14px 0;}
+  .wrap{max-width:560px;margin:0 auto;padding:32px 20px 100px}
+  header{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--hud);box-shadow:0 0 12px var(--hud)}
+  h1{font-size:22px;font-weight:700}
+
+  .card{background:var(--card);border:1px solid rgba(0,255,208,.1);border-radius:18px;padding:20px;margin-top:16px;box-shadow:0 8px 20px rgba(0,0,0,.35)}
   .q{font-size:18px;line-height:1.6;margin-bottom:14px}
-  .hint{opacity:.7;font-size:13px;margin-top:6px}
-  .options{display:flex;flex-direction:column;gap:10px}
-  button,opt-btn{font:inherit}
-  .chip{padding:12px 14px;border:1px solid rgba(0,0,0,.08);border-radius:12px;background:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
-  .chip:hover{border-color:rgba(0,0,0,.2)}
-  .chip.sel{border-color:var(--glow);box-shadow:0 0 0 3px rgba(0,255,208,.18);} 
+  .hint{font-size:13px;color:var(--muted);margin-bottom:14px}
+
+  .chip{padding:12px 14px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.02);cursor:pointer;margin-bottom:10px;transition:.2s}
+  .chip:hover{border-color:var(--hud);background:rgba(0,255,208,.07)}
+  .chip.sel{border-color:var(--hud);background:rgba(0,255,208,.18);box-shadow:0 0 12px rgba(0,255,208,.2)}
+
   .actions{display:flex;gap:10px;margin-top:14px}
-  .btn{padding:12px 16px;border-radius:12px;border:1px solid rgba(0,0,0,.08);background:#fff;cursor:pointer}
-  .btn.primary{border-color:var(--glow);background:linear-gradient(180deg,#e9fffb,#dffdf6);box-shadow:0 8px 20px rgba(0,255,208,.22)}
-  .progress{height:6px;background:#eef2f8;border-radius:999px;overflow:hidden;margin:12px 0 8px}
-  .bar{height:100%;background:linear-gradient(90deg,var(--glow),#59f);width:0%;transition:width .25s ease}
-  .foot{position:fixed;left:0;right:0;bottom:0;background:#fff6;border-top:1px solid #e6ecf5;backdrop-filter:saturate(120%) blur(8px);padding:10px 14px}
-  .muted{opacity:.6}
+  .btn{padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);cursor:pointer;color:var(--text)}
+  .btn.primary{border-color:var(--hud);background:linear-gradient(180deg,rgba(0,255,208,.25),rgba(0,255,208,.05))}
 
-  /* 人格卡 */
-  .card-result{background:#0b1220;color:#e6f7ff;border-radius:18px;padding:18px;box-shadow:0 12px 24px rgba(6,10,30,.35);}
-  .badge{display:inline-block;padding:6px 10px;border:1px solid rgba(0,255,208,.5);border-radius:999px;margin-right:8px}
-  .title{font-size:22px;margin:6px 0 12px}
-  .pill{display:inline-block;margin:6px 6px 0 0;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);}
+  .progress{height:6px;background:#1a2738;border-radius:999px;overflow:hidden;margin:12px 0 8px}
+  .bar{height:100%;background:linear-gradient(90deg,var(--hud),var(--hud2));width:0%;transition:width .25s ease}
 
+  /* 结果卡 */
+  .result-card{background:rgba(0,0,0,.45);backdrop-filter:blur(12px);border:1px solid rgba(0,255,208,.3);border-radius:18px;padding:20px;margin-top:20px}
 </style>
 </head>
 <body>
-<div class="bg grid stars"></div>
+<div class="stars"></div>
+<div class="grid"></div>
 <div class="wrap">
-  <header>
-    <div class="dot"></div>
-    <h1>2035 未来出行</h1>
-  </header>
+  <header><div class="dot"></div><h1>2035 未来出行</h1></header>
   <div class="progress"><div id="bar" class="bar"></div></div>
-
   <div id="panel" class="card">
-    <div id="qtext" class="q">连接未来出行意识中…</div>
+    <div id="qtext" class="q"></div>
     <div id="hint" class="hint"></div>
-    <div id="opts" class="options"></div>
+    <div id="opts"></div>
     <div class="actions">
       <button class="btn" id="prevBtn" onclick="prev()" style="display:none">上一步</button>
       <button class="btn primary" id="nextBtn" onclick="next()">继续</button>
     </div>
   </div>
-
-  <div id="result" style="display:none" class="card-result"></div>
-
-  <div class="foot"><span class="muted">风格：Calm Sci‑Fi × HUD｜数据云：Supabase</span></div>
+  <div id="result" class="result-card" style="display:none"></div>
 </div>
 
-<!-- Supabase SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<!-- html2canvas 用于导出卡片图像（可选） -->
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
-const SUPABASE_URL = "https://xrsthdmcujustsezwaln.supabase.co"; 
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyc3RoZG1jdWp1c3RzZXp3YWxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NzkxMzAsImV4cCI6MjA3NzM1NTEzMH0.i3iGszKjV6UAnG9HpT7o9p83QMT84z2GJ1V5fDawdD0"; // ← 必填
-// localStorage 检查
-(function(){
-  let allowRecord = true;
-  let stored = localStorage.getItem('answered');
-  if (stored === 'yes') {
-    const msg = "检测到你已提交过问卷。
+const SUPABASE_URL = "https://xrsthdmcujustsezwaln.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyc3RoZG1jdWp1c3RzZXp3YWxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NzkxMzAsImV4cCI6MjA3NzM1NTEzMH0.i3iGszKjV6UAnG9HpT7o9p83QMT84z2GJ1V5fDawdD0";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-选择：
-【确定】覆盖旧记录重新提交
-【取消】仅体验，不记录数据";
-    if (confirm(msg)) {
-      localStorage.removeItem('answered');
-      allowRecord = true;
-    } else {
-      allowRecord = false;
-      window.skipLog = true;
-    }
-  }
-  window.allowRecord = allowRecord;
-})();
-// ✅ Supabase client (only define once)
-if (!window.sb) {
-  window.sb = (SUPABASE_URL && SUPABASE_KEY && window.supabase)
-    ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-    : null;
-}('survey_done');
-// ✅ Supabase client (only define once)
-if (!window.sb) {
-  window.sb = (SUPABASE_URL && SUPABASE_KEY && window.supabase)
-    ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-    : null;
+let stored = localStorage.getItem("survey_done");
+let allowRecord = !stored;
+if(stored){
+  if(confirm("你已经填写过一次问卷\n\n确定 = 覆盖旧记录\n取消 = 本次不记录，仅体验")){
+    localStorage.removeItem("survey_done");
+    allowRecord = true;
+  } else allowRecord = false;
 }
 
-/***** 2) 题库（来自你的原问卷，路线 D 文案） *****/
-// type: 'single' 单选｜'multi' 多选（max 可选个数）｜'likert' 五级
-const quiz = [
-  { key:'age_group', type:'single', q:'2035 · 你将处于哪段人生能量周期？', hint:'用于生成“移动体责任指数”', opts:[
-    ['≤25｜探索与突破', {C:0.5,S:0.3}],
-    ['26–35｜效率/成长', {D:0.6,L:0.2}],
-    ['36–45｜家庭×事业平衡', {S:0.4,I:0.3}],
-    ['46–55｜稳健拓展', {L:0.4}],
-    ['56–65｜舒适长程', {S:0.5}],
-    ['≥66｜陪伴与健康', {S:0.6}]
-  ]},
-  { key:'city_tier', type:'single', q:'你所处的城市“频率”是？', hint:'用于城市生态复杂度建模', opts:[
-    ['超级枢纽（特大/一线）', {D:0.3,T:0.2}],
-    ['高速增长体（新一线/省会）', {D:0.2}],
-    ['城市与社区带（地级）', {C:0.2}],
-    ['宜居小城/县域', {S:0.2}],
-    ['自然共生网络（乡镇/乡野）', {S:0.3}]
-  ]},
-  { key:'family', type:'single', q:'你将与怎样的“生命编队”同行？', hint:'推断舱位与空间需求', opts:[
-    ['单人节点', {I:0.6}],
-    ['二人协奏', {I:0.3}],
-    ['核心家庭', {Sh:0.5}],
-    ['多代共生', {Sh:0.7}],
-    ['其他/动态结构', {}]
-  ]},
-  { key:'purpose', type:'multi', max:3, q:'你的行动“主目的”是？（可多选）', hint:'多选至多 3 项', opts:[
-    ['通勤通路', {D:0.4}],
-    ['家庭陪伴与照护', {S:0.4,Sh:0.3}],
-    ['商务切换', {D:0.5,L:0.3}],
-    ['生活流/城市漫游', {S:0.3,C:0.3}],
-    ['城际/远行', {D:0.3}],
-    ['移动办公/创作空间', {L:0.4}],
-    ['其他', {}]
-  ]},
-  { key:'daily_km', type:'single', q:'你的日常行动半径？', hint:'估算能量系统与补能频率', opts:[
-    ['0–30km', {C:0.2}], ['31–60km', {C:0.1}], ['61–100km', {D:0.2}], ['101–150km', {D:0.3}], ['150km+', {D:0.4}]
-  ]},
-  { key:'time_slot', type:'single', q:'你的时间节奏更偏向？', hint:'运行窗口', opts:[
-    ['清晨启动', {C:0.2}], ['白日流动', {}], ['高峰节点穿梭', {D:0.2}], ['夜行者节奏', {S:0.2}], ['不定/多时段', {D:0.1}]
-  ]},
-  { key:'freq', type:'single', q:'你的行动频率是？', hint:'运营频度', opts:[
-    ['轻频率', {C:0.2}], ['稳定循环', {}], ['高频多节点', {D:0.3}], ['随机与灵感', {S:0.2}]
-  ]},
-  { key:'pt_satisfy', type:'likert', q:'未来，你愿让公共/共享系统承担多少行动？', hint:'1=仅备选，5=全交付', opts:['1','2','3','4','5'] },
-  { key:'form', type:'single', q:'你愿你的移动体以怎样的存在方式陪伴你？', hint:'决定形态与心智', opts:[
-    ['进化座舱/能量体', {D:0.4,L:0.3}],
-    ['仿生共生体', {S:0.5}],
-    ['流动空间', {C:0.4}],
-    ['神经旅程通道', {S:0.4}],
-    ['混合/自定义', {S:0.2,D:0.2}]
-  ]},
-  { key:'autonomy', type:'single', q:'你愿意交付多少行动自主权？', hint:'自动驾驶接受度', opts:[
-    ['我主驾', {Ctrl:0.6}],
-    ['主驾+AI辅助', {Ctrl:0.3,T:0.2}],
-    ['AI主驾+我监管', {T:0.4}],
-    ['完全自动/无方向盘', {T:0.7}],
-    ['意识驾驶/融合控制', {T:0.5,S:0.2}]
-  ]},
-  { key:'in_cabin', type:'single', q:'运行时，你的“主状态”？', hint:'舱内模式偏好', opts:[
-    ['休息与疗愈', {S:0.4}],
-    ['沉浸娱乐', {S:0.3}],
-    ['高效工作/学习', {L:0.5}],
-    ['冥想/精神流动', {S:0.5,C:0.2}],
-    ['社交对话', {Sh:0.3}]
-  ]},
-  { key:'features', type:'multi', max:4, q:'你希望舱内优先强化哪些“能力”？（多选≤4）', hint:'功能偏好', opts:[
-    ['AI 深度助手', {L:0.3}],
-    ['舒适座舱/座椅AI', {S:0.2}],
-    ['声场/氛围', {S:0.3}],
-    ['健康/情绪监测', {S:0.2}],
-    ['互联/导航/V2X', {L:0.3}],
-    ['变形空间/收纳', {L:0.2}],
-    ['户外/露营模块', {S:0.2}],
-    ['其他', {}]
-  ]},
-  { key:'ota', type:'single', q:'OTA（进化升级，即车辆像手机一样自动更新）对你重要吗？', hint:'进化期望', opts:[
-    ['无需更新', {C:0.2}], ['可选升级', {}], ['定期更新', {L:0.2}], ['高度依赖更新', {L:0.4}], ['期待持续自我进化', {L:0.6}]
-  ]},
-  { key:'open', type:'single', q:'用一句话描述你心中的 2035 完美移动体。', hint:'开放题（可略过）', opts:[['（略过）',{}]]}
+// 简化问题集（示例）
+const quiz=[
+ {key:'age',type:'single',q:'2035 · 你将处于哪段人生能量周期？',hint:'用于责任指数',opts:['≤25','26–35','36–45','46–55','56–65','≥66']},
+ {key:'city',type:'single',q:'你所在的城市类型是？',hint:'生态复杂度',opts:['一线','新一线/省会','地级市','县城','乡镇']},
+ {key:'freq',type:'single',q:'你的出行频率是？',hint:'行动节奏',opts:['低频','稳定','高频','随机灵感']},
+ {key:'form',type:'single',q:'未来你期望的出行形态？',hint:'载具形态',opts:['胶囊车','仿生伴行','空间流动','神经旅程','混合模式']},
 ];
 
-/***** 3) 运行态 *****/
-let i = -1; // 当前题索引
-const answers = {}; // key -> value or array
-const traits = {C:0,D:0,S:0,L:0,T:0,Ctrl:0,I:0,Sh:0}; // Calm/Driven/Soul/Logic/Trust/Control/Individual/Shared
+let i=-1;const answers={};
+const qEl=document.getElementById('qtext');const hintEl=document.getElementById('hint');const optsEl=document.getElementById('opts');const barEl=document.getElementById('bar');const panel=document.getElementById('panel');const res=document.getElementById('result');
 
-const qEl = document.getElementById('qtext');
-const hintEl = document.getElementById('hint');
-const optsEl = document.getElementById('opts');
-const nextBtn = document.getElementById('nextBtn');
-const prevBtn = document.getElementById('prevBtn');
-const barEl = document.getElementById('bar');
-const resultEl = document.getElementById('result');
-
-function start(){ next(); }
-
-function prev(){ if(i<=0){return} i--; render(); }
-function next(){ i++; if(i>=quiz.length){ finish(); return;} render(); }
+function prev(){if(i<=0)return;i--;render();}
+function next(){i++;if(i>=quiz.length)return finish();render();}
 
 function render(){
-  prevBtn.style.display = i>0? 'inline-flex':'none';
-  const p = (i/quiz.length*100).toFixed(1); barEl.style.width = p+'%';
-  const q = quiz[i];
-  qEl.textContent = q.q; hintEl.textContent = q.hint||'';
-  nextBtn.style.display = (q.type==='single'||q.type==='likert')? 'none':'inline-flex';
-  // 生成选项
-  optsEl.innerHTML = '';
-  if(q.type==='single'){
-    (q.opts).forEach(([label,vec])=>{
-      const div = document.createElement('div'); div.className='chip'; div.textContent = label;
-      div.onclick = ()=>{ chooseSingle(q, label, vec) };
-      optsEl.appendChild(div);
-    })
-  } else if(q.type==='multi'){
-    const max = q.max || 99; const selected = new Set(answers[q.key]||[]);
-    q.opts.forEach(([label,vec])=>{
-      const div = document.createElement('div'); div.className='chip'; div.textContent=label; if(selected.has(label)) div.classList.add('sel');
-      div.onclick = ()=>{
-        if(selected.has(label)){ selected.delete(label); div.classList.remove('sel'); }
-        else { if(selected.size>=max){ alert(`最多可选 ${max} 项`); return;} selected.add(label); div.classList.add('sel'); }
-        answers[q.key] = Array.from(selected);
-      };
-      optsEl.appendChild(div);
-    });
-    nextBtn.onclick = ()=>{ // 统计向量并提交（按平均记分）
-      const picked = answers[q.key]||[]; if(picked.length===0){ alert('请至少选择 1 项'); return; }
-      picked.forEach(label=>{ const vec = (q.opts.find(o=>o[0]===label)||[])[1]||{}; addVec(vec); logStep(q.q, label); });
-      next();
-    }
-  } else if(q.type==='likert'){
-    const wrap = document.createElement('div'); wrap.style.display='flex'; wrap.style.gap='10px';
-    q.opts.forEach(v=>{
-      const b = document.createElement('button'); b.className='btn'; b.textContent=v; b.onclick=()=>{ answers[q.key]=v; addVec({T:(+v-3)*0.15}); logStep(q.q, v); next(); };
-      wrap.appendChild(b);
-    });
-    optsEl.appendChild(wrap);
-  }
+ document.getElementById('prevBtn').style.display=i>0?'inline-flex':'none';
+ barEl.style.width=(i/quiz.length*100)+"%";
+ const q=quiz[i];qEl.textContent=q.q;hintEl.textContent=q.hint;optsEl.innerHTML="";
+ q.opts.forEach(opt=>{
+  const d=document.createElement('div');d.className='chip';d.textContent=opt;
+  d.onclick=()=>{answers[q.key]=opt;log(q.q,opt);next();};
+  optsEl.appendChild(d);
+ });
 }
 
-function chooseSingle(q, label, vec){
-  answers[q.key] = label; addVec(vec||{}); logStep(q.q, label); next();
-}
-
-function addVec(vec){ for(const k in vec){ traits[k] = (traits[k]||0) + vec[k]; } }
-
-async function logStep(step, answer){
-  // 本地已填过则不记录
-  if(!allowRecord) return;
-  if(!sb) return;(step, answer){
-  if(!sb) return; // 本地调试可用
-  try{
-    await sb.from('answers').insert({ step, answer, time:new Date().toISOString() });
-  }catch(e){ console.log('log step err',e); }
+async function log(step,ans){
+ if(!allowRecord)return;
+ await sb.from('answers').insert({step,answer:ans,time:new Date().toISOString()});
 }
 
 function finish(){
-  // 首次作答标记
-  if(allowRecord){ localStorage.setItem('survey_done','1'); }
-  document.getElementById('panel').style.display='none';(){
-  document.getElementById('panel').style.display='none';
-  document.getElementById('result').style.display='block';
-  const persona = computePersona(traits);
-  resultEl.innerHTML = renderCard(persona);
+ panel.style.display='none';res.style.display='block';
+ localStorage.setItem('survey_done','1');
+ res.innerHTML=`✅ 已完成！<br><br>感谢你参与未来出行共创 🌌`;
 }
 
-function computePersona(t){
-  // 维度对比
-  const axis = {
-    pace: t.D - t.C, // 正=驱动 负=宁静
-    mind: t.S - t.L, // 正=灵魂 负=理性
-    trust: t.T - (t.Ctrl||0), // 正=信任AI 负=偏人控
-    social: (t.Sh||0) - (t.I||0) // 正=共享 负=个体
-  };
-  // 类型命名（A+B 混合风格）
-  let name = '';
-  if(axis.pace<=0 && axis.mind>=0) name = '静域漫行者 · α';
-  else if(axis.pace>0 && axis.mind<0) name = '速域执行者 · R';
-  else if(axis.mind>=0 && axis.trust>0.2) name = '心流共鸣体 · S';
-  else name = '均衡导航者 · N';
-
-  // 建议载具
-  let vehicle = '心流静域舱';
-  if(axis.pace>0.3 && axis.mind<0) vehicle='BladePilot 高速自主舱';
-  else if(axis.mind>0.3) vehicle='仿生共生体 · 伴行模式';
-  else if(Math.abs(axis.social)>0.3 && axis.social>0) vehicle='共享胶囊网 · 编队模式';
-
-  // 关键词
-  const tags = [];
-  tags.push(axis.pace>0?'驱动':'宁静');
-  tags.push(axis.mind>0?'感性':'理性');
-  tags.push(axis.trust>0?'信任AI':'人控偏好');
-  tags.push(axis.social>0?'共享协同':'个体主导');
-
-  return { name, vehicle, tags, axis, detail: t, answers };
-}
-
-function renderCard(p){
-  return `
-    <div class="badge">AI Persona</div>
-    <div class="badge">2035</div>
-    <div class="title">你是：<b>${p.name}</b></div>
-    <div style="margin:8px 0 14px;opacity:.8">推荐移动体：<b>${p.vehicle}</b></div>
-    <div>
-      ${p.tags.map(x=>`<span class="pill">${x}</span>`).join('')}
-    </div>
-    <div style="margin-top:14px;opacity:.8;font-size:13px">你可长按保存或点击导出图片。</div>
-    <div class="actions" style="margin-top:12px">
-      <button class="btn" onclick="exportCard()">导出卡片图片</button>
-      <button class="btn" onclick="restart()">重新作答</button>
-    </div>
-  `;
-}
-
-function restart(){ location.reload(); }
-
-async function exportCard(){
-  const node = document.getElementById('result');
-  const canvas = await html2canvas(node,{backgroundColor:'#0b1220',scale:2});
-  const link = document.createElement('a');
-  link.download = 'future-persona-card.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
-}
-
-// localStorage 检查
-(function(){
-  let allowRecord = true;
-  let stored = localStorage.getItem('answered');
-  if (stored === 'yes') {
-    const msg = "检测到你已提交过问卷。
-
-选择：
-【确定】覆盖旧记录重新提交
-【取消】仅体验，不记录数据";
-    if (confirm(msg)) {
-      localStorage.removeItem('answered');
-      allowRecord = true;
-    } else {
-      allowRecord = false;
-      window.skipLog = true;
-    }
-  }
-  window.allowRecord = allowRecord;
-})();
-// 启动
-// 如果已填过，提示用户
-if(!allowRecord){
-  setTimeout(()=>alert('系统检测到你已提交过一次，本次回答不会被记录，尽情体验吧！🎧'),1200);
-}
-setTimeout(start, 600);
+next();
 </script>
-</body>
-</html>
+</body></html>
